@@ -3,7 +3,7 @@
 * cpp17[meta cpp]
 
 ## 概要
-`placement new`を使用して、参照型や`const`データメンバを含む構造体/クラスを置き換える際、オブジェクト生存期間(lifetime)に基づいた最適化の抑止をコンパイラに伝える関数`std::launder`を用いることで、未定義動作となるような文脈で参照型や`const`データメンバへのアクセスができます。
+`placement new`を使用して、参照型や`const`データメンバを含む構造体/クラスを置き換える際、オブジェクト生存期間(lifetime)に基づいた最適化の抑止をコンパイラに伝える関数`std::launder`を用いることで、未定義動作となるような文脈で参照型や`const`データメンバへのアクセスができる。
 
 ## 仕様
 [n4659](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/n4659.pdf) [ptr.launder]/5より
@@ -12,7 +12,7 @@
 struct X { const int n; };
 X *p = new X{3};
 const int a = p->n;
-new (p) X{5};  // X::nはconstなので、pは新しいオブジェクトを指していません
+new (p) X{5};  // X::nはconstなので、pは新しいオブジェクトを指していない
 const int b = p->n;  // 未定義動作
 const int c = std::launder(p)->n;  // OK
 ```
@@ -45,7 +45,7 @@ int main()
 ```
 
 ## この機能が必要になった背景・経緯
-以前は、`placement new`の戻り値を用いることで未定義動作を起こさないようにすることができた。そして、`std::optional`のようなクラスでは、次のように`placement new`の戻り値を保持するために、メンバにポインタを追加する必要があった。
+未定義動作を起こさないようにするために、`placement new`の戻り値を用いることができる。しかし、`std::optional`のようなクラスでは、次のように`placement new`の戻り値を保持するために、メンバにポインタを追加する必要があった。
 
 ```cpp
 template <typename T> 
@@ -65,7 +65,7 @@ public:
     p = ::new (&payload) T(std::forward<Args>(args)...); 
   } 
   const T& operator*() const & { 
-    return *p;  // ここで payload を使わないでください!
+    return *p;  // ここでは payload を使わない
   }
 };
 ```
